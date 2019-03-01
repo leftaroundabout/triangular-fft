@@ -20,7 +20,8 @@ library
   exposed-modules:     Math.Function.Trafo.FFT.Triangular
   -- other-modules:       
   other-extensions:    FlexibleInstances, FlexibleContexts
-  build-depends:       base >=4.10 && <4.13, manifolds >=0.5 && <0.6
+  build-depends:       base >=4.10 && <4.13, transformers, containers
+                       , manifolds >=0.5 && <0.6
                        , vector>=0.11 && <0.14
                        , vector-space
                        , linear >=1.18 && <1.22
