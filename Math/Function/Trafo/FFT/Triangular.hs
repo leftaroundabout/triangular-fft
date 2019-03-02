@@ -59,8 +59,9 @@ sampleTriangle resos f
                                               let (iHere, iRem) = iRun`divMod`rHere
                                               return $ fromIntegral iHere / fromIntegral rHere
                                              ) resos) iLin
-                     in if foldr
-                         then f . UnitTriangle $ fmap fromIntegral ixs)
+                     in if foldl' (+) 0 poss <= 1
+                         then f $ UnitTriangle poss
+                         else 0 )
         resos
         zeroV
         Lin.identity
