@@ -55,10 +55,11 @@ sampleTriangle resos f
     = HomSampledTriangFunction 
         (UArr.generate (foldl' (*) 1 resos)
           $ \iLin -> let poss = evalState (traverse (\rHere->do
-                                              iRun <- get
-                                              let (iHere, iRem) = iRun`divMod`rHere
-                                              return $ fromIntegral iHere / fromIntegral rHere
-                                             ) resos) iLin
+                                    iRun <- get
+                                    let (iRem, iHere) = iRun`divMod`rHere
+                                    put iRem
+                                    return $ (fromIntegral iHere + 0.5) / fromIntegral rHere
+                                   ) resos) iLin
                      in if foldl' (+) 0 poss <= 1
                          then f $ UnitTriangle poss
                          else 0 )
