@@ -10,9 +10,17 @@
 
 {-# LANGUAGE FlexibleInstances      #-}
 {-# LANGUAGE FlexibleContexts       #-}
+{-# LANGUAGE TypeFamilies           #-}
+{-# LANGUAGE LambdaCase             #-}
 
 module Math.Function.Trafo.FFT.Triangular
-           where
+        ( UnitTriangle(..)
+        , HomSampledTriangFunction
+        , evalTriangFunction
+        , sampleTriangle
+        -- * Internals
+        , homSampledTriangFnData
+        ) where
 
 import Data.Manifold.Types
 import Data.Complex
@@ -66,3 +74,38 @@ sampleTriangle resos f
         resos
         zeroV
         Lin.identity
+
+type family ListNesting (dims :: * -> *) s :: *
+type instance ListNesting Lin.V0 s =     s
+type instance ListNesting Lin.V1 s =    [s]
+type instance ListNesting Lin.V2 s =   [[s]]
+type instance ListNesting Lin.V3 s =  [[[s]]]
+type instance ListNesting Lin.V4 s = [[[[s]]]]
+
+class HomSampledDataView (dims :: * -> *) where
+  homSampledTriangFnData :: UArr.Unbox s
+                 => HomSampledTriangFunction dims s -> ListNesting dims s
+
+instance HomSampledDataView Lin.V0 where
+  homSampledTriangFnData (HomSampledTriangFunction d _ _ _) = d UArr.! 0
+instance HomSampledDataView Lin.V1 where
+  homSampledTriangFnData (HomSampledTriangFunction d _ _ _) = UArr.toList d
+instance HomSampledDataView Lin.V2 where
+  homSampledTriangFnData (HomSampledTriangFunction d resos@(Lin.V2 rx ry) _ _)
+     = UArr.ifoldr 
+          (\iLin q
+             -> let Lin.V2 (ix,x) (iy,y)
+                      = evalState (traverse (\rHere->do
+                               iRun <- get
+                               let (iRem, iHere) = iRun`divMod`rHere
+                               put iRem
+                               return ( iHere
+                                      , (fromIntegral iHere + 0.5) / fromIntegral rHere ) 
+                              ) resos) iLin
+                in if x+y <= 1
+                    then \case (h:l) | ix<rx-1 -> (q:h):l
+                               l               -> [q]:l
+                    else \case ([]:l) -> []:l
+                               l      -> []:l )
+          []
+          d
