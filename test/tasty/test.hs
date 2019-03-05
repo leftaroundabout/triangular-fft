@@ -8,9 +8,8 @@ main :: IO ()
 main = defaultMain $ testGroup "Tests"
  [ testGroup "Triangular-function sampling"
   [ testProperty "xy-Sampling"
-     $ \(QC.Positive resx) -> let resy = resx
-         in
-             homSampledTriangFnData
+     $ \(QC.Positive resx) (QC.Positive resy)
+         -> homSampledTriangFnData
                 (sampleTriangle (V2 resx resy)
                                 (\(UnitTriangle (V2 x y)) -> V2 x y)
                             :: HomSampledTriangFunction V2 (V2 Double))

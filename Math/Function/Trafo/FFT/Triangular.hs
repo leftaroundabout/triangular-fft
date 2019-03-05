@@ -92,7 +92,7 @@ instance HomSampledDataView Lin.V1 where
   homSampledTriangFnData (HomSampledTriangFunction d _ _ _) = UArr.toList d
 instance HomSampledDataView Lin.V2 where
   homSampledTriangFnData (HomSampledTriangFunction d resos@(Lin.V2 rx ry) _ _)
-     = UArr.ifoldr 
+     = filter (not . null) $ UArr.ifoldr 
           (\iLin q
              -> let Lin.V2 (ix,x) (iy,y)
                       = evalState (traverse (\rHere->do
