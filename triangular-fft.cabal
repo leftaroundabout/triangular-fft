@@ -35,3 +35,5 @@ test-suite tasty
   build-depends:   base, triangular-fft
                    , tasty>=1.1 && <1.3
                    , tasty-quickcheck>=0.9 && <0.11
+                   , QuickCheck
+                   , linear
